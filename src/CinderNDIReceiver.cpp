@@ -6,6 +6,7 @@
 #include <Processing.NDI.Recv.h>
 
 CinderNDIReceiver::CinderNDIReceiver()
+	: mNdiSources{ nullptr }
 {
 	if( ! NDIlib_is_supported_CPU() ) {
 		CI_LOG_E( "Failed to initialize NDI because of unsupported CPU!" );
@@ -14,6 +15,21 @@ CinderNDIReceiver::CinderNDIReceiver()
 	if( ! NDIlib_initialize() ) {
 		CI_LOG_E( "Failed to initialize NDI!" );
 	}
+
+	const NDIlib_find_create_t NDI_find_create_desc = { true, nullptr };
+
+	mNdiFinder = NDIlib_find_create( &NDI_find_create_desc );
+	if( !mNdiFinder ) {
+		CI_LOG_E( "Failed to create NDI finder!" );
+	}
+
+	DWORD no_sources = 0;
+	const NDIlib_source_t* p_sources = nullptr;
+	while( !no_sources ) {
+		mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 1000 );
+	}
+
+	initConnection();
 
 	mNdiInitialized = true;
 }
@@ -31,35 +47,15 @@ CinderNDIReceiver::~CinderNDIReceiver()
 	mNdiInitialized = false;
 }
 
-void CinderNDIReceiver::setup()
-{
-	if( mNdiInitialized ) {
-		const NDIlib_find_create_t NDI_find_create_desc = { true, nullptr };
-
-		mNdiFinder = NDIlib_find_create( &NDI_find_create_desc );
-		if( ! mNdiFinder ) {
-			CI_LOG_E( "Failed to create NDI finder!" );
-		}
-		
-		unsigned int no_sources = 0;
-		const NDIlib_source_t* p_sources = nullptr;
-		while( ! no_sources ) {
-			mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 10000 );
-		}
-
-		initConnection();
-	}
-}
-
 void CinderNDIReceiver::initConnection()
 {
 	if( mNdiSources ) {
 		NDIlib_recv_create_t NDI_recv_create_desc = 
 		{
 			mNdiSources[0],
-			false,
+			NDIlib_recv_color_format::NDIlib_recv_color_format_BGRA_BGRA,
 			NDIlib_recv_bandwidth_highest,
-			true 
+			TRUE
 		};
 
 		mNdiReceiver = NDIlib_recv_create2( &NDI_recv_create_desc );
@@ -77,7 +73,7 @@ void CinderNDIReceiver::initConnection()
 void CinderNDIReceiver::update()
 {
 	// Check if we have at least one source
-	unsigned int no_sources = 0;
+	DWORD no_sources = 0;
 	const NDIlib_source_t* p_sources = nullptr;
 	mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 0 );
 
@@ -85,7 +81,7 @@ void CinderNDIReceiver::update()
 		mReadToReceive = false;
 		// Connections might take a while.. Wait for 10secs..
 		while( ! no_sources ) {
-			mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 10000 );
+			mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 1000 );
 		}
 	}
 	else {

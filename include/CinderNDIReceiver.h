@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-#include<Processing.NDI.Lib.h>
+#include <windows.h>
+#include <Processing.NDI.Lib.h>
 #include "cinder/gl/Texture.h"
 
 class CinderNDIReceiver{
@@ -9,7 +10,6 @@ class CinderNDIReceiver{
 		CinderNDIReceiver();
 		~CinderNDIReceiver();
 
-		void setup();
 		void update();
 		ci::gl::Texture2dRef getVideoTexture();
 	private:

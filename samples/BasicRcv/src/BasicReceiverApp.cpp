@@ -1,6 +1,7 @@
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
+
 #include "CinderNDIReceiver.h"
 
 using namespace ci;
@@ -8,8 +9,7 @@ using namespace ci::app;
 
 class BasicReceiverApp : public App {
   public:
-	
-	void setup() override;
+	BasicReceiverApp();
 	void update() override;
 	void draw() override;
 
@@ -17,13 +17,12 @@ class BasicReceiverApp : public App {
 	CinderNDIReceiver mReceiver;
 };
 
-void prepareSettings( BasicReceiverApp::Settings* settings )
-{
-}
 
-void BasicReceiverApp::setup()
+
+BasicReceiverApp::BasicReceiverApp()
+	: mReceiver{}
 {
-	mReceiver.setup();
+
 }
 
 void BasicReceiverApp::update()
@@ -41,6 +40,10 @@ void BasicReceiverApp::draw()
 		Rectf centeredRect = Rectf( tex->getBounds() ).getCenteredFit( getWindowBounds(), true );
 		gl::draw( tex, centeredRect );
 	}
+}
+
+void prepareSettings( BasicReceiverApp::Settings* settings )
+{
 }
 
 // This line tells Cinder to actually create and run the application.

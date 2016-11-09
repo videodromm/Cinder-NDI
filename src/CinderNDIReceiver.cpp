@@ -139,6 +139,11 @@ void CinderNDIReceiver::update()
 	}
 }
 
+std::pair<std::string, long long> CinderNDIReceiver::getMetadata()
+{
+	return std::pair<std::string, long long>();
+}
+
 ci::gl::Texture2dRef CinderNDIReceiver::getVideoTexture()
 {
 	return mVideoTexture;

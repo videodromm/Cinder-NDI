@@ -15,7 +15,8 @@ CinderNDISender::CinderNDISender( const std::string name )
 		CI_LOG_E( "Failed to initialize NDI!" );
 	}
 
-	mNdiInitialized = true;
+	NDIlib_send_create_t NDI_send_create_desc = { mName.c_str(), nullptr, true, false };
+	mNdiSender = NDIlib_send_create( &NDI_send_create_desc );
 }
 
 CinderNDISender::~CinderNDISender()
@@ -24,26 +25,21 @@ CinderNDISender::~CinderNDISender()
 		NDIlib_send_destroy( mNdiSender );
 	}
 	NDIlib_destroy();
-	mNdiInitialized = false;
 }
 
-void CinderNDISender::setup()
+
+void CinderNDISender::sendSurface( const ci::SurfaceRef& surface )
 {
-	if( mNdiInitialized ) {
-		
-		NDIlib_send_create_t NDI_send_create_desc = { mName.c_str(), nullptr, true, false };
-		mNdiSender = NDIlib_send_create( &NDI_send_create_desc );
-	}
+	sendSurface( surface, NDIlib_send_timecode_synthesize );
 }
 
-void CinderNDISender::sendSurface( ci::SurfaceRef surface )
+void CinderNDISender::sendSurface( const ci::SurfaceRef& surface, long long timecode )
 {
 	if( surface ) {
-
 		if( NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
 
 			NDIlib_tally_t NDI_tally;
-			NDIlib_send_get_tally( mNdiSender, &NDI_tally, 0 );  
+			NDIlib_send_get_tally( mNdiSender, &NDI_tally, 0 );
 
 			const NDIlib_video_frame_t NDI_video_frame = {
 				(unsigned int)( surface->getWidth() ),
@@ -52,7 +48,7 @@ void CinderNDISender::sendSurface( ci::SurfaceRef surface )
 				60000, 1001,
 				(float)surface->getWidth()/(float)surface->getHeight(),
 				true,
-				NDIlib_send_timecode_synthesize,
+				timecode,
 				surface->getData(),
 				(unsigned int)( surface->getRowBytes() )
 			};
@@ -62,3 +58,18 @@ void CinderNDISender::sendSurface( ci::SurfaceRef surface )
 	}
 }
 
+void CinderNDISender::sendMetadata( const std::string & metadataString )
+{
+	sendMetadata( metadataString, NDIlib_send_timecode_synthesize );
+}
+
+void CinderNDISender::sendMetadata( const std::string & metadataString, long long timecode )
+{
+	const NDIlib_metadata_frame_t NDI_metadata = {
+		(unsigned int)(metadataString.size()),
+		timecode,
+		const_cast<CHAR*>( metadataString.c_str() )
+	};
+
+	NDIlib_recv_send_metadata( mNdiSender, &NDI_metadata );
+}

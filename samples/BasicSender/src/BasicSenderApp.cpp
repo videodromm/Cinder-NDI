@@ -9,14 +9,10 @@ using namespace ci::app;
 
 class BasicSenderApp : public App {
   public:
-	  BasicSenderApp() : mSender( "test-cinder-video" ){}
-	
-	void setup() override;
+	BasicSenderApp();
+
 	void update() override;
 	void draw() override;
-
-  private:
-	void loadMovieFile( const fs::path &moviePath );
   private:
 	CinderNDISender			mSender;
 	ci::SurfaceRef 			mSurface;
@@ -25,25 +21,18 @@ class BasicSenderApp : public App {
 	gl::PboRef				mPbo[2];
 };
 
-void BasicSenderApp::loadMovieFile( const fs::path &moviePath )
+BasicSenderApp::BasicSenderApp()
+ : mSender( "test-cinder-video" )
+, mIndexNew{ 0 }
+, mIndexOld{ 1 }
 {
-
-}
-
-void BasicSenderApp::setup()
-{
-	mIndexNew = 0;
-	mIndexOld = 1;
-
 	mFbo[0] = gl::Fbo::create( getWindowWidth(), getWindowHeight(), false );
 	mFbo[1] = gl::Fbo::create( getWindowWidth(), getWindowHeight(), false );
 
-	mSurface = ci::Surface::create( getWindowWidth(), getWindowHeight(), true );
+	mSurface = ci::Surface::create( getWindowWidth(), getWindowHeight(), true, SurfaceChannelOrder::BGRA );
 
 	mPbo[0] = gl::Pbo::create( GL_PIXEL_PACK_BUFFER, getWindowWidth() * getWindowHeight() * 4, 0, GL_STREAM_READ );
 	mPbo[1] = gl::Pbo::create( GL_PIXEL_PACK_BUFFER, getWindowWidth() * getWindowHeight() * 4, 0, GL_STREAM_READ );
-
-	mSender.setup();
 }
 
 void BasicSenderApp::update()
@@ -68,20 +57,14 @@ void BasicSenderApp::update()
 		gl::drawSolidRect( Rectf{ 0,0, float( 0.5f * (glm::sin( getElapsedSeconds() ) + 1.0f) ) * app::getWindowWidth(), float( app::getWindowHeight() ) } );
 	}
 
-
-	mSender.sendSurface( mSurface );
+	long long timecode = app::getElapsedFrames();
+	mSender.sendSurface( mSurface, timecode );
 }
 
 void BasicSenderApp::draw()
 {
 	gl::clear( ColorA::black() );
-
-
-
-
 	gl::draw( mFbo[mIndexNew]->getColorTexture() );
-	
-
 	std::swap( mIndexNew, mIndexOld );
 }
 

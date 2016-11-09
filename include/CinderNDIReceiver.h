@@ -11,6 +11,7 @@ class CinderNDIReceiver{
 		~CinderNDIReceiver();
 
 		void update();
+		std::pair<std::string, long long> getMetadata();
 		ci::gl::Texture2dRef getVideoTexture();
 	private:
 		void initConnection();

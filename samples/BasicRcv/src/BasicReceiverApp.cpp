@@ -1,6 +1,7 @@
 #include "cinder/app/App.h"
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
+#include "cinder/Log.h"
 
 #include "CinderNDIReceiver.h"
 
@@ -35,11 +36,13 @@ void BasicReceiverApp::update()
 void BasicReceiverApp::draw()
 {
 	gl::clear( ColorA::black() );
+	auto meta = mReceiver.getMetadata();
 	auto tex = mReceiver.getVideoTexture();
-	if( tex ) {
-		Rectf centeredRect = Rectf( tex->getBounds() ).getCenteredFit( getWindowBounds(), true );
-		gl::draw( tex, centeredRect );
+	if( tex.first ) {
+		Rectf centeredRect = Rectf( tex.first->getBounds() ).getCenteredFit( getWindowBounds(), true );
+		gl::draw( tex.first, centeredRect );
 	}
+	CI_LOG_I( " Frame: " << tex.second << ", metadata: " << meta.first << " : " << meta.second );
 }
 
 void prepareSettings( BasicReceiverApp::Settings* settings )

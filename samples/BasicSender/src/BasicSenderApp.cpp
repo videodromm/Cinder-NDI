@@ -58,6 +58,7 @@ void BasicSenderApp::update()
 	}
 
 	long long timecode = app::getElapsedFrames();
+	mSender.sendMetadata( "test string\n", timecode );
 	mSender.sendSurface( mSurface, timecode );
 }
 

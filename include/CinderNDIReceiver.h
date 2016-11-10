@@ -12,14 +12,15 @@ class CinderNDIReceiver{
 
 		void update();
 		std::pair<std::string, long long> getMetadata();
-		ci::gl::Texture2dRef getVideoTexture();
+		std::pair<ci::gl::Texture2dRef, long long> getVideoTexture();
 	private:
 		void initConnection();
 	private:
 		bool mNdiInitialized = false;
 		bool mReadToReceive = false;
-		ci::gl::Texture2dRef mVideoTexture;
+		std::pair<ci::gl::Texture2dRef, long long> mVideoTexture;
 
+		std::pair<std::string, long long> mMetadata;
 		NDIlib_recv_instance_t mNdiReceiver;
 		NDIlib_find_instance_t mNdiFinder;
 		const NDIlib_source_t* mNdiSources = nullptr; // Owned by NDI.

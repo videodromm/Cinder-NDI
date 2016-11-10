@@ -2,10 +2,11 @@
 
 #include "cinder/Log.h"
 #include "cinder/Surface.h"
-#include <Processing.NDI.Recv.h>
+
+#include <Processing.NDI.Send.h>
 
 CinderNDISender::CinderNDISender( const std::string name )
-: mName( name )	
+: mName{ name }, mNdiSender{ nullptr }
 {
 	if( ! NDIlib_is_supported_CPU() ) {
 		CI_LOG_E( "Failed to initialize NDI because of unsupported CPU!" );
@@ -35,26 +36,23 @@ void CinderNDISender::sendSurface( const ci::SurfaceRef& surface )
 
 void CinderNDISender::sendSurface( const ci::SurfaceRef& surface, long long timecode )
 {
-	if( surface ) {
-		if( NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
+	if( surface && NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
+		NDIlib_tally_t NDI_tally;
+		NDIlib_send_get_tally( mNdiSender, &NDI_tally, 0 );
 
-			NDIlib_tally_t NDI_tally;
-			NDIlib_send_get_tally( mNdiSender, &NDI_tally, 0 );
+		const NDIlib_video_frame_t NDI_video_frame = {
+			(unsigned int)( surface->getWidth() ),
+			(unsigned int)( surface->getHeight() ),
+			NDIlib_FourCC_type_BGRA,
+			60000, 1001,
+			(float)surface->getWidth()/(float)surface->getHeight(),
+			true,
+			timecode,
+			surface->getData(),
+			(unsigned int)( surface->getRowBytes() )
+		};
 
-			const NDIlib_video_frame_t NDI_video_frame = {
-				(unsigned int)( surface->getWidth() ),
-				(unsigned int)( surface->getHeight() ),
-				NDIlib_FourCC_type_BGRA,
-				60000, 1001,
-				(float)surface->getWidth()/(float)surface->getHeight(),
-				true,
-				timecode,
-				surface->getData(),
-				(unsigned int)( surface->getRowBytes() )
-			};
-
-			NDIlib_send_send_video( mNdiSender, &NDI_video_frame );
-		}
+		NDIlib_send_send_video( mNdiSender, &NDI_video_frame );
 	}
 }
 
@@ -65,11 +63,13 @@ void CinderNDISender::sendMetadata( const std::string & metadataString )
 
 void CinderNDISender::sendMetadata( const std::string & metadataString, long long timecode )
 {
-	const NDIlib_metadata_frame_t NDI_metadata = {
-		(unsigned int)(metadataString.size()),
-		timecode,
-		const_cast<CHAR*>( metadataString.c_str() )
-	};
+	if( NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
+		const NDIlib_metadata_frame_t NDI_metadata = {
+			(unsigned int)(metadataString.size()),
+			timecode,
+			const_cast<CHAR*>(metadataString.c_str())
+		};
 
-	NDIlib_recv_send_metadata( mNdiSender, &NDI_metadata );
+		NDIlib_send_send_metadata( mNdiSender, &NDI_metadata );
+	}
 }

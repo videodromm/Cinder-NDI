@@ -96,16 +96,17 @@ void CinderNDIReceiver::update()
 
 	if( mReadyToReceive ) {
 
-		NDIlib_video_frame_t video_frame;
-		//NDIlib_audio_frame_t audio_frame;
-		NDIlib_metadata_frame_t metadata_frame;
+		for( int i = 0; i < 2; ++i ) {
+			NDIlib_video_frame_t video_frame;
+			//NDIlib_audio_frame_t audio_frame;
+			NDIlib_metadata_frame_t metadata_frame;
 
-		switch( NDIlib_recv_capture( mNdiReceiver, &video_frame, NULL, &metadata_frame, 1000 ) )
-		{
-			// No data
+			switch( NDIlib_recv_capture( mNdiReceiver, &video_frame, NULL, &metadata_frame, 0 ) )
+			{
+				// No data
 			case NDIlib_frame_type_none:
 			{
-				CI_LOG_I( "No data received. ");
+				CI_LOG_I( "No data received. " );
 				break;
 			}
 
@@ -115,7 +116,7 @@ void CinderNDIReceiver::update()
 				//CI_LOG_I( "Video data received with width: " << video_frame.xres << " and height: " << video_frame.yres );
 				auto surface = ci::Surface::create( video_frame.p_data, video_frame.xres, video_frame.yres, video_frame.line_stride_in_bytes, ci::SurfaceChannelOrder::RGBA );
 				mVideoTexture.first = ci::gl::Texture::create( *surface );
-				mVideoTexture.first->setTopDown(true);
+				mVideoTexture.first->setTopDown( true );
 				mVideoTexture.second = video_frame.timecode;
 				NDIlib_recv_free_video( mNdiReceiver, &video_frame );
 				break;
@@ -137,6 +138,7 @@ void CinderNDIReceiver::update()
 				mMetadata.second = metadata_frame.timecode;
 				NDIlib_recv_free_metadata( mNdiReceiver, &metadata_frame );
 				break;
+			}
 			}
 		}
 	}

@@ -17,7 +17,7 @@ class CinderNDIReceiver{
 		void initConnection();
 	private:
 		bool mNdiInitialized = false;
-		bool mReadToReceive = false;
+		bool mReadyToReceive = false;
 		std::pair<ci::gl::Texture2dRef, long long> mVideoTexture;
 
 		std::pair<std::string, long long> mMetadata;

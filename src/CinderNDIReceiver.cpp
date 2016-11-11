@@ -66,7 +66,7 @@ void CinderNDIReceiver::initConnection()
 		const NDIlib_tally_t tally_state = { true, false };
 		NDIlib_recv_set_tally( mNdiReceiver, &tally_state);
 
-		mReadToReceive = true;
+		mReadyToReceive = true;
 	}
 }
 
@@ -78,7 +78,7 @@ void CinderNDIReceiver::update()
 	mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 0 );
 
 	if( ! no_sources ) {
-		mReadToReceive = false;
+		mReadyToReceive = false;
 		// Connections might take a while.. Wait for 10secs..
 		while( ! no_sources ) {
 			mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 1000 );
@@ -87,21 +87,21 @@ void CinderNDIReceiver::update()
 	else {
 		// If we are here it means that the source has changed
 		// so we need to rebuild our receiver.
-		if( ! mReadToReceive ) {
+		if( ! mReadyToReceive ) {
 			if( mNdiReceiver ) NDIlib_recv_destroy( mNdiReceiver );
 			initConnection();
 		}
 
 	}
 
-	if( mReadToReceive ) {
+	if( mReadyToReceive ) {
 
 		NDIlib_video_frame_t video_frame;
-		NDIlib_audio_frame_t audio_frame;
+		//NDIlib_audio_frame_t audio_frame;
 		NDIlib_metadata_frame_t metadata_frame;
 
-		switch( NDIlib_recv_capture( mNdiReceiver, &video_frame, &audio_frame, &metadata_frame, 1000 ) )
-		{	
+		switch( NDIlib_recv_capture( mNdiReceiver, &video_frame, NULL, &metadata_frame, 1000 ) )
+		{
 			// No data
 			case NDIlib_frame_type_none:
 			{
@@ -124,8 +124,8 @@ void CinderNDIReceiver::update()
 			// Audio data
 			case NDIlib_frame_type_audio:
 			{
-				CI_LOG_I( "Audio data received with " << audio_frame.no_samples << " number of samples" );
-				NDIlib_recv_free_audio( mNdiReceiver, &audio_frame );
+				//CI_LOG_I( "Audio data received with " << audio_frame.no_samples << " number of samples" );
+				//NDIlib_recv_free_audio( mNdiReceiver, &audio_frame );
 				break;
 			}
 

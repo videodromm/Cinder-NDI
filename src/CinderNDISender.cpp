@@ -56,20 +56,23 @@ void CinderNDISender::sendSurface( const ci::SurfaceRef& surface, long long time
 	}
 }
 
-void CinderNDISender::sendMetadata( const std::string & metadataString )
+void CinderNDISender::sendMetadata( const ci::XmlTree& metadataString )
 {
 	sendMetadata( metadataString, NDIlib_send_timecode_synthesize );
 }
 
-void CinderNDISender::sendMetadata( const std::string & metadataString, long long timecode )
+void CinderNDISender::sendMetadata( const ci::XmlTree& xmlTree, long long timecode )
 {
+	auto str = ci::toString( xmlTree );
+
 	if( NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
 		const NDIlib_metadata_frame_t NDI_metadata = {
-			(unsigned int)(metadataString.size()),
+			(unsigned int)(str.size()),
 			timecode,
-			const_cast<CHAR*>(metadataString.c_str())
+			const_cast<CHAR*>(str.c_str())
 		};
 
+		CI_LOG_I( "Sending: " << str );
 		NDIlib_send_send_metadata( mNdiSender, &NDI_metadata );
 	}
 }

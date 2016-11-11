@@ -22,7 +22,7 @@ class BasicSenderApp : public App {
 };
 
 BasicSenderApp::BasicSenderApp()
- : mSender( "test-cinder-video" )
+: mSender( "test-cinder-video" )
 , mIndexNew{ 0 }
 , mIndexOld{ 1 }
 {
@@ -58,7 +58,9 @@ void BasicSenderApp::update()
 	}
 
 	long long timecode = app::getElapsedFrames();
-	mSender.sendMetadata( "test string\n", timecode );
+
+	XmlTree msg{ "ci_meta", "test string" };
+	mSender.sendMetadata( msg, timecode );
 	mSender.sendSurface( mSurface, timecode );
 }
 

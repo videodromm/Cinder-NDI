@@ -71,8 +71,6 @@ void CinderNDISender::sendMetadata( const ci::XmlTree& xmlTree, long long timeco
 			timecode,
 			const_cast<CHAR*>(str.c_str())
 		};
-
-		CI_LOG_I( "Sending: " << str );
 		NDIlib_send_send_metadata( mNdiSender, &NDI_metadata );
 	}
 }

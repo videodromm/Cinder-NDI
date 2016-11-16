@@ -61,7 +61,7 @@ void BasicSenderApp::update()
 
 	XmlTree msg{ "ci_meta", "test string" };
 	mSender.sendMetadata( msg, timecode );
-	mSender.sendSurface( mSurface, timecode );
+	mSender.sendSurface( *mSurface, timecode );
 }
 
 void BasicSenderApp::draw()

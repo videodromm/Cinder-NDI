@@ -13,8 +13,8 @@ class CinderNDISender{
 		CinderNDISender( const std::string name );
 		~CinderNDISender();
 
-		void sendSurface( const ci::SurfaceRef& surface);
-		void sendSurface( const ci::SurfaceRef&, long long timecode );
+		void sendSurface( ci::Surface& surface);
+		void sendSurface( ci::Surface&, long long timecode );
 
 		void sendMetadata( const ci::XmlTree& metadataString );
 		void sendMetadata( const ci::XmlTree& metadataString, long long timecode );

@@ -116,7 +116,7 @@ void CinderNDIReceiver::update()
 				//CI_LOG_I( "Video data received with width: " << video_frame.xres << " and height: " << video_frame.yres );
 				auto surface = ci::Surface::create( video_frame.p_data, video_frame.xres, video_frame.yres, video_frame.line_stride_in_bytes, ci::SurfaceChannelOrder::BGRA );
 				mVideoTexture.first = ci::gl::Texture::create( *surface );
-				//mVideoTexture.first->setTopDown( true );
+				mVideoTexture.first->setTopDown( true );
 				mVideoTexture.second = video_frame.timecode;
 				NDIlib_recv_free_video( mNdiReceiver, &video_frame );
 				break;

@@ -23,7 +23,7 @@ CinderNDIReceiver::CinderNDIReceiver()
 		CI_LOG_E( "Failed to create NDI finder!" );
 	}
 
-	DWORD no_sources = 0;
+	int no_sources = 0;
 	const NDIlib_source_t* p_sources = nullptr;
 	while( !no_sources ) {
 		mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 1000 );
@@ -53,7 +53,7 @@ void CinderNDIReceiver::initConnection()
 		NDIlib_recv_create_t NDI_recv_create_desc = 
 		{
 			mNdiSources[0],
-			NDIlib_recv_color_format::NDIlib_recv_color_format_BGRA_BGRA,
+			NDIlib_recv_color_format_e::NDIlib_recv_color_format_e_BGRX_BGRA,
 			NDIlib_recv_bandwidth_highest,
 			TRUE
 		};
@@ -73,7 +73,7 @@ void CinderNDIReceiver::initConnection()
 void CinderNDIReceiver::update()
 {
 	// Check if we have at least one source
-	DWORD no_sources = 0;
+	int no_sources = 0;
 	const NDIlib_source_t* p_sources = nullptr;
 	mNdiSources = NDIlib_find_get_sources( mNdiFinder, &no_sources, 0 );
 

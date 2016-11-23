@@ -6,7 +6,7 @@
 #include <Processing.NDI.Send.h>
 
 CinderNDISender::CinderNDISender( const std::string name )
-: mName{ name }, mNdiSender{ nullptr }
+	: mName{ name }, mNdiSender{ nullptr }, mFramerateNumerator{ 60000 }, mFramerateDenominator{ 1001 }
 {
 	if( ! NDIlib_is_supported_CPU() ) {
 		CI_LOG_E( "Failed to initialize NDI because of unsupported CPU!" );
@@ -28,6 +28,12 @@ CinderNDISender::~CinderNDISender()
 	NDIlib_destroy();
 }
 
+void CinderNDISender::setFramerate( int numerator, int denominator )
+{
+	mFramerateNumerator = numerator;
+	mFramerateDenominator = denominator;
+}
+
 
 void CinderNDISender::sendSurface( ci::Surface& surface )
 {
@@ -44,9 +50,9 @@ void CinderNDISender::sendSurface( ci::Surface& surface, long long timecode )
 			(unsigned int)( surface.getWidth() ),
 			(unsigned int)( surface.getHeight() ),
 			NDIlib_FourCC_type_BGRA,
-			60000, 1001,
+			mFramerateNumerator, mFramerateDenominator,
 			(float)surface.getWidth()/(float)surface.getHeight(),
-			true,
+			NDIlib_frame_format_type_e::NDIlib_frame_format_type_progressive,
 			timecode,
 			(BYTE *)(surface.getData()),
 			(unsigned int)( surface.getRowBytes() )

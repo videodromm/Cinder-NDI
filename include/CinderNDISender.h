@@ -13,12 +13,15 @@ class CinderNDISender{
 		CinderNDISender( const std::string name );
 		~CinderNDISender();
 
+		void setFramerate( int numerator, int denominator );
+
 		void sendSurface( ci::Surface& surface);
 		void sendSurface( ci::Surface&, long long timecode );
 
 		void sendMetadata( const ci::XmlTree& metadataString );
 		void sendMetadata( const ci::XmlTree& metadataString, long long timecode );
 	private:
+		int						mFramerateNumerator, mFramerateDenominator;
 		NDIlib_send_instance_t	mNdiSender;
 		std::string				mName;
 };

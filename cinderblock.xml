@@ -14,8 +14,8 @@
 	<sourcePattern>src/*.cpp</sourcePattern>
 	<headerPattern>include/*.h</headerPattern>
 
-	<includePath absolute="true">$(NDI_PATH)/Include</includePath>
-	<staticLibrary absolute="true">$(NDI_PATH)/Lib/$(PlatformTarget)/Processing.NDI.Lib.x64.lib</staticLibrary>
-	<buildCopy absolute="true">$(NDI_PATH)/Bin/$(PlatformTarget)/Processing.NDI.Lib.x64.dll</buildCopy>
+	<includePath>ndisdk/include</includePath>
+	<staticLibrary>ndisdk/lib/$(PlatformTarget)/Processing.NDI.Lib.x64.lib</staticLibrary>
+	<buildCopy>ndisdk/bin/$(PlatformTarget)/Processing.NDI.Lib.x64.dll</buildCopy>
 </block>
 </cinder>

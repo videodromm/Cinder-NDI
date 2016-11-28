@@ -43,6 +43,12 @@ void CinderNDISender::sendSurface( ci::Surface& surface )
 void CinderNDISender::sendSurface( ci::Surface& surface, long long timecode )
 {
 	if( NDIlib_send_get_no_connections( mNdiSender, 0 ) ) {
+
+		NDIlib_metadata_frame_t metadata_desc;
+		if( NDIlib_send_capture( mNdiSender, &metadata_desc, 0 ) ) {
+			CI_LOG_I( "Received meta-data : " << metadata_desc.p_data );
+		}
+
 		NDIlib_tally_t NDI_tally;
 		NDIlib_send_get_tally( mNdiSender, &NDI_tally, 0 );
 
@@ -54,11 +60,17 @@ void CinderNDISender::sendSurface( ci::Surface& surface, long long timecode )
 			(float)surface.getWidth()/(float)surface.getHeight(),
 			NDIlib_frame_format_type_e::NDIlib_frame_format_type_progressive,
 			timecode,
-			(BYTE *)(surface.getData()),
-			(unsigned int)( surface.getRowBytes() )
+			(uint8_t *)(surface.getData()),
+			(int)( surface.getRowBytes() )
 		};
 
 		NDIlib_send_send_video( mNdiSender, &NDI_video_frame );
+
+		//if( timecode % 25 == 0 )
+		//	CI_LOG_I( ( NDI_tally.on_program ? "PGM " : "" ) << " " << ( NDI_tally.on_preview ? "PVW " : "" ) );
+	}
+	else {
+		CI_LOG_I( "No connection, not sending frames." );
 	}
 }
 

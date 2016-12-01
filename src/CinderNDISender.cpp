@@ -70,7 +70,7 @@ void CinderNDISender::sendSurface( ci::Surface& surface, long long timecode )
 		//	CI_LOG_I( ( NDI_tally.on_program ? "PGM " : "" ) << " " << ( NDI_tally.on_preview ? "PVW " : "" ) );
 	}
 	else {
-		CI_LOG_I( "No connection, not sending frames." );
+		//CI_LOG_I( "No connection, not sending frames." );
 	}
 }
 

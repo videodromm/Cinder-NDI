@@ -16,7 +16,8 @@ class CinderNDISender{
 		void setFramerate( int numerator, int denominator );
 
 		void sendSurface( ci::Surface& surface);
-		void sendSurface( ci::Surface&, long long timecode );
+		void sendSurface( ci::Surface&, long long timecode, bool async = false );
+		void sendSurfaceForceSync();
 
 		void sendMetadata( const ci::XmlTree& metadataString );
 		void sendMetadata( const ci::XmlTree& metadataString, long long timecode );
